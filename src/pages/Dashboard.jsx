@@ -10,7 +10,7 @@ import useStatsFromCsv from '../hooks/useStatsFromCsv'
 const { Title, Text } = Typography
 
 export default function Dashboard() {
-  const csvUrl = new URL('../assets/top_por_categoria_congresso.csv', import.meta.url).href
+  const csvUrl = new URL('../assets/parlamentares.csv', import.meta.url).href
   const { error, loading, stats } = useStatsFromCsv(csvUrl)
   return (
     <>
