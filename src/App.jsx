@@ -103,7 +103,7 @@ export default function AppLayout() {
               icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             />
             <Title level={4} style={{ margin: 0 }}>
-              Debatim App
+              Debatim
             </Title>
           </Flex>
 

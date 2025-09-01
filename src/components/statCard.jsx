@@ -1,34 +1,25 @@
-import { Card, Typography, theme } from 'antd'
+import { Card, Typography } from 'antd'
+import { formatCompact } from '../utils/formatters'
 
 const { Text, Title } = Typography
 
-const formatNumber = (n) => new Intl.NumberFormat('pt-BR').format(n)
-
-export default function StatCard({ title, value, icon, loading = false }) {
-  const { token } = theme.useToken()
-  const text = token.colorText
-  const primary = token.colorPrimary
-
+export default function StatCard({
+  title,
+  value,
+  icon,
+  loading = false,
+  valueFormatter = formatCompact, // <= aqui
+}) {
   return (
     <Card
       loading={loading}
-      style={{
-        borderRadius: 12,
-        boxShadow: '0 4px 18px rgba(0,0,0,0.06)',
-      }}
+      style={{ borderRadius: 12, boxShadow: '0 4px 18px rgba(0,0,0,0.06)' }}
       bodyStyle={{ padding: 20 }}
     >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
           <Text
             style={{
-              color: text,
               opacity: 0.65,
               textTransform: 'uppercase',
               fontWeight: 700,
@@ -38,8 +29,8 @@ export default function StatCard({ title, value, icon, loading = false }) {
           >
             {title}
           </Text>
-          <Title level={3} style={{ margin: 0, marginTop: 4, color: text }}>
-            {formatNumber(value)}
+          <Title level={3} style={{ margin: 0, marginTop: 4 }}>
+            {valueFormatter(value)}
           </Title>
         </div>
         <div
@@ -48,22 +39,11 @@ export default function StatCard({ title, value, icon, loading = false }) {
             width: 56,
             height: 56,
             borderRadius: '50%',
-            background: primary,
             display: 'grid',
             placeItems: 'center',
           }}
         >
-          <div
-            style={{
-              content: '""',
-              position: 'absolute',
-              inset: -10,
-              borderRadius: '50%',
-              background: `radial-gradient(closest-side, ${primary}22, transparent 70%)`,
-              zIndex: 0,
-            }}
-          />
-          <div style={{ color: '#fff', fontSize: 22, zIndex: 1 }}>{icon}</div>
+          <div style={{ fontSize: 22 }}>{icon}</div>
         </div>
       </div>
     </Card>
