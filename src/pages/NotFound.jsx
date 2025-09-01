@@ -7,7 +7,11 @@ export default function NotFound() {
       status="404"
       title="404"
       subTitle="Página não encontrada."
-      extra={<Button type="primary"><Link to="/">Voltar para Home</Link></Button>}
+      extra={
+        <Button type="primary">
+          <Link to="/">Voltar para Home</Link>
+        </Button>
+      }
     />
   )
 }
