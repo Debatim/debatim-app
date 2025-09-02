@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
+    "@vercel/speed-insights": "^1.2.0",
     "antd": "^5.27.1",
     "echarts": "^5.6.0",
     "echarts-for-react": "^3.0.2",
