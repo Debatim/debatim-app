@@ -12,6 +12,7 @@ import EChart from '../components/EChart'
 
 import { formatCompact, formatDateBR, formatNumberBR } from '../utils/formatters'
 import useDataFromCSV from '../hooks/useDataFromCsv'
+import useLeadersFromCsv from '../hooks/useLeadsFromCsv'
 
 const { Title } = Typography
 
@@ -31,6 +32,15 @@ export default function Dashboard() {
     loading: seriesLoading,
     error: seriesError,
   } = useDataFromCSV(csvUrl)
+
+  const {
+    topLabels,
+    topInteracoes,
+    points,
+    hasLikesComments,
+    loading: leadersLoading,
+    error: leadersError,
+  } = useLeadersFromCsv(csvUrl, 10)
 
   // Opções do Segmented (só mostra Visualizações se existir no CSV)
   const segmentedOptions = useMemo(() => {
@@ -94,12 +104,96 @@ export default function Dashboard() {
     }
   }, [dates, posts, interacoes, visualizacoes, metric, token.colorTextSecondary])
 
+  const optionTopAccounts = useMemo(
+    () => ({
+      grid: { left: 120, right: 16, top: 16, bottom: 32, containLabel: true },
+      xAxis: {
+        type: 'value',
+        axisLabel: {
+          formatter: (v) => formatCompact(v),
+          color: token.colorTextSecondary,
+          fontSize: 14,
+        },
+        splitLine: { show: true },
+      },
+      yAxis: {
+        type: 'category',
+        data: topLabels,
+        axisLabel: { color: token.colorText, fontSize: 14 },
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (p) => {
+          const item = p[0]
+          return `<b>${item.name}</b><br/>Interações: ${formatNumberBR(item.value)}`
+        },
+      },
+      series: [
+        {
+          name: 'Interações',
+          type: 'bar',
+          data: topInteracoes,
+          barWidth: 18,
+          emphasis: { focus: 'series' },
+        },
+      ],
+    }),
+    [topLabels, topInteracoes, token.colorTextSecondary, token.colorText]
+  )
+
+  const optionLeaders = useMemo(
+    () => ({
+      grid: { left: 60, right: 24, top: 40, bottom: 48, containLabel: true },
+      xAxis: {
+        type: 'value',
+        name: hasLikesComments ? 'Curtidas' : 'Visualizações',
+        axisLabel: {
+          formatter: (v) => formatCompact(v),
+          color: token.colorTextSecondary,
+          fontSize: 14,
+        },
+        splitLine: { show: true },
+      },
+      yAxis: {
+        type: 'value',
+        name: hasLikesComments ? 'Comentários' : 'Interações',
+        axisLabel: {
+          formatter: (v) => formatCompact(v),
+          color: token.colorTextSecondary,
+          fontSize: 14,
+        },
+        splitLine: { show: true },
+      },
+      tooltip: {
+        trigger: 'item',
+        formatter: (p) => {
+          const [x, y] = p.value
+          const xLbl = hasLikesComments ? 'Curtidas' : 'Visualizações'
+          const yLbl = hasLikesComments ? 'Comentários' : 'Interações'
+          return `<b>${p.name}</b><br/>${xLbl}: ${formatNumberBR(x)}<br/>${yLbl}: ${formatNumberBR(y)}`
+        },
+      },
+      series: [
+        {
+          type: 'scatter',
+          name: 'Contas',
+          data: points,
+          symbolSize: 10,
+          emphasis: {
+            focus: 'self',
+            label: { show: true, formatter: ({ name }) => name, position: 'top' },
+          },
+        },
+      ],
+    }),
+    [points, hasLikesComments, token.colorTextSecondary]
+  )
+
   return (
     <>
       {error && <div style={{ color: 'red' }}>Erro ao ler CSV: {String(error)}</div>}
-
       <Title level={3}>Painel Analítico</Title>
-
       {/* KPIs */}
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} lg={6}>
@@ -130,7 +224,6 @@ export default function Dashboard() {
           />
         </Col>
       </Row>
-
       {/* Segmented + Gráfico abaixo */}
       {seriesError ? (
         <div style={{ color: 'red' }}>Erro: {String(seriesError)}</div>
@@ -162,6 +255,36 @@ export default function Dashboard() {
             {seriesLoading ? <Spin /> : <EChart option={option} height={360} />}
           </Card>
         </Flex>
+      )}
+      {leadersError ? (
+        <div style={{ color: 'red' }}>Erro ao ler CSV: {String(leadersError)}</div>
+      ) : (
+        <Row style={{ marginTop: 30 }} gutter={[16, 16]}>
+          <Col xs={24} lg={12}>
+            <Card>
+              <Title level={3} style={{ marginBottom: 8 }}>
+                Contas com mais interações
+              </Title>
+              <div style={{ marginTop: -8, color: token.colorTextSecondary }}>
+                Soma de curtidas, comentários e compartilhamentos (ou equivalente)
+              </div>
+              {leadersLoading ? <Spin /> : <EChart option={optionTopAccounts} height={420} />}
+            </Card>
+          </Col>
+
+          <Col xs={24} lg={12}>
+            <Card>
+              <Title level={3} style={{ marginBottom: 8 }}>
+                Lideranças nas redes
+              </Title>
+              <div style={{ marginTop: -8, color: token.colorTextSecondary }}>
+                Comparação de{' '}
+                {hasLikesComments ? 'curtidas e comentários' : 'visualizações e interações'}
+              </div>
+              {leadersLoading ? <Spin /> : <EChart option={optionLeaders} height={420} />}
+            </Card>
+          </Col>
+        </Row>
       )}
     </>
   )
