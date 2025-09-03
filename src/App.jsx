@@ -38,13 +38,13 @@ export default function AppLayout() {
     {
       key: 'analytics',
       icon: <BarChartOutlined />,
-      label: <Link to="/analytics">Analytics</Link>,
+      label: <Link to="/analytics">Narrativa</Link>,
       disabled: true,
     },
     {
       key: 'settings',
       icon: <SettingOutlined />,
-      label: <Link to="/settings">Settings</Link>,
+      label: <Link to="/settings">Configuração</Link>,
       disabled: true,
     },
   ]
